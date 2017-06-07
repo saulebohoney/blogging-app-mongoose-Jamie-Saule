@@ -2,4 +2,23 @@
 //                        global.DATABASE_URL ||'mongodb://localhost/blogging-app';
 exports.DATABASE_URL = 'mongodb://saule:123@ds113282.mlab.com:13282/blogging-app';
 
-exports.PORT = process.env.PORT || 8080;
+//exports.PORT = process.env.PORT || 8080;
+
+'use strict';
+
+//require('dotenv').config();
+//const DATABASE_URL = process.env.DATABASE_URL || global.DATABASE_URL;
+// exports.DATABASE = {
+//   client: 'mongoose',
+//   connection: DATABASE_URL,
+//  // pool: { min: 0, max: 3 },
+//   // debug: true
+// };
+
+// var db = require('dotenv')
+// db.connect({
+//   host: process.env.DB_HOST,
+//   username: process.env.DB_USER,
+//   password: process.env.DB_PASS
+// })
+exports.PORT = process.env.PORT || 8080; 
