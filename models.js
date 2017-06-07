@@ -31,7 +31,7 @@ blogSchema.virtual('nameString').get(function() {
 
 blogSchema.methods.apiRepr = function() {
   return {
-   // id: this._id,
+    id: this._id,
     title: this.title,
     content: this.content,
     author: this.nameString,
