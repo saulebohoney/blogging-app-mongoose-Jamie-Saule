@@ -15,11 +15,7 @@ const { TEST_DATABASE_URL } = require('../config');
 
 chai.use(chaiHttp);
 
-// used to put randomish documents in db
-// so we have data to work with and assert about.
-// we use the Faker library to automatically
-// generate placeholder values for author, title, content
-// and then we insert that data into mongo
+
 function seedBlogData() {
   console.info('seeding blog data');
   const seedData = [];
@@ -39,9 +35,9 @@ function generateBlogData() {
       firstName: faker.name.firstName(),
       lastName: faker.name.lastName()
     }
+    // created: faker.date.recent()
   };
 }
-
 
 // this function deletes the entire database.
 // we'll call it in an `afterEach` block below
@@ -74,10 +70,8 @@ describe('Blog API resource', function () {
     return closeServer();
   });
 
-  //ALL OTHER TESTS///
 
   describe('GET endpoint', function () {
-
     it('should return all existing blog posts', function () {
       // strategy:
       //    1. get back all restaurants returned by by GET request to `/restaurants`
@@ -96,7 +90,7 @@ describe('Blog API resource', function () {
           res.should.have.status(200);
           // otherwise our db seeding didn't work
           res.body.blogs.should.have.length.of.at.least(1);
-          console.log(res.body.blogs[0]);
+          //console.log(res.body.blogs[0]);
           return Blog.count();
         })
         .then(function (count) {
@@ -132,7 +126,7 @@ describe('Blog API resource', function () {
           resBlog.content.should.equal(blog.content);
           resBlog.author.should.equal(`${blog.author.firstName} ${blog.author.lastName}`);
           //resBlog.author.lastName.should.equal(blog.author.lastName);
-          resBlog.created.should.equal(blog.created);
+          resBlog.created.should.be.sameMoment(blog.created);
           //try making created to created.should.equal and see if there is difference//
         });
     });
@@ -146,7 +140,8 @@ describe('Blog API resource', function () {
     it('should add a new blog', function () {
 
       const newBlog = generateBlogData();
-
+      console.log('this is the original date', newBlog.created);
+      let createdAt;
       return chai.request(app)
         .post('/blogs')
         .send(newBlog)
@@ -162,15 +157,15 @@ describe('Blog API resource', function () {
           res.body.content.should.equal(newBlog.content);
           res.body.author.should.equal(`${newBlog.author.firstName} ${newBlog.author.lastName}`);
           res.body.created.should.not.be.null;
-
+          createdAt = res.body.created;
           return Blog.findById(res.body.id);
         })
         .then(function (blog) {
-          console.log('this is from line 169', blog);
           blog.title.should.equal(newBlog.title);
           blog.content.should.equal(newBlog.content);
-          blog.author.should.equal(`${newBlog.author.firstName} ${newBlog.author.lastName}`);
-          blog.created.should.equal(newBlog.created);
+          blog.author.firstName.should.equal(newBlog.author.firstName);
+          blog.author.lastName.should.equal(newBlog.author.lastName);
+          blog.created.should.be.sameMoment(createdAt);
         });
     });
   });
@@ -184,7 +179,8 @@ describe('Blog API resource', function () {
     //  4. Prove restaurant in db is correctly updated
     it('should update fields you send over', function () {
       const updateData = {
-        title: 'Our crazy vision'
+        title: ' ',
+        content: ' ',
       };
 
       return Blog
@@ -206,10 +202,10 @@ describe('Blog API resource', function () {
         })
         .then(function (blog) {
           blog.title.should.equal(updateData.title);
+          blog.content.should.equal(updateData.content);
         });
     });
   });
-
   describe('DELETE endpoint', function () {
     // strategy:
     //  1. get a restaurant
@@ -240,6 +236,4 @@ describe('Blog API resource', function () {
         });
     });
   });
-
-  ///ENDING SEMI-COLON////
 });
