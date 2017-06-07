@@ -2,3 +2,10 @@ language: node_js
 node_js: node
 services:
 - mongodb
+deploy:
+  provider: heroku
+  api_key:
+    secure: FYHfIqpp5HWuvolAAvMy+Mf4hDOJO5NKv3Hq+gHLqCJwI7b+nFth5V7TmMqMuRBGBTR4BkDjfEoB0sQrSf/b9f/sUedgFOgDpg4lJvb5+Q8FLSbvQPEXr649xfKoANu0bF0iFT/DIXKpRlZP5boBHm04eIVwDW+ki6y/jYluaVdrAM0SxCBj9I1AHfufrdQXhoicIcgiEROmT56VqehhwfL+miNr1PvQFhOnMJr5YH9YtvWIVT59KuL8XC6DeJtE6acclqBtQoj96TTYRKByt++NEWSnG9l/bgXVmIpjv4BbxM4ZmuqHDjHndyRRFTC+8CJrhZAZyNi1edAXdmvzbeXsRshyo3b5MHHZzsdBKzgQnUoCSrakRpievQ1nPjYwf/No3s631UQGNEMdx+ywRlrIyjxJxk2hhE1fnzn1CC4BNnAA4VQtNGzww+4FsYB57rXXOoW96B4OzTeQmT9wgrteX7mwtfvNEu/J8UAm/T0kwgti7d+baBf2vN7QRz+9s5BEzeMObyOwYgCFcmisGaiknR0iuGkmgUSKOvFnTUwvstiGeUgL6AXSzp2QtkS+d35jXPnqZ+EIacHHZ3Pf7u7IlRy81omt9iVQiAsAy/UM/hIa3gA5V+x4Edmr/wA2SoPOpc7rBWjOcN9fOl0M5Fk9JDVyEBiyGPb+i9WmdIc=
+  app: secret-harbor-84347
+  on:
+    repo: saulebohoney/blogging-app-mongoose-Jamie-Saule
