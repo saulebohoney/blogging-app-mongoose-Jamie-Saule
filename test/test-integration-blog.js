@@ -161,11 +161,12 @@ describe('Blog API resource', function () {
           res.body.id.should.not.be.null;
           res.body.content.should.equal(newBlog.content);
           res.body.author.should.equal(`${newBlog.author.firstName} ${newBlog.author.lastName}`);
-          res.body.created.should.equal(newBlog.created);
+          res.body.created.should.not.be.null;
 
           return Blog.findById(res.body.id);
         })
         .then(function (blog) {
+          console.log('this is from line 169', blog);
           blog.title.should.equal(newBlog.title);
           blog.content.should.equal(newBlog.content);
           blog.author.should.equal(`${newBlog.author.firstName} ${newBlog.author.lastName}`);
