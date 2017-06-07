@@ -14,7 +14,7 @@ const { app, runServer, closeServer } = require('../server');
 const { TEST_DATABASE_URL } = require('../config');
 
 chai.use(chaiHttp);
-chai.use(require('chai-moment-js'));
+chai.use(require('chai-moment'));
 
 
 function seedBlogData() {
