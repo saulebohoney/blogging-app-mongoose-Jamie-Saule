@@ -1,10 +1,11 @@
-// exports.DATABASE_URL = process.env.DATABASE_URL ||
-//                        global.DATABASE_URL ||'mongodb://localhost/blogging-app';
-exports.DATABASE_URL = 'mongodb://saule:123@ds113282.mlab.com:13282/blogging-app';
+
+require('dotenv').config();
+exports.DATABASE_URL = process.env.DATABASE_URL ||
+    global.DATABASE_URL ||'localhost:27017/database';
+    //'mongodb://saule:123@ds113282.mlab.com:13282/blogging-app';
 
 //exports.PORT = process.env.PORT || 8080;
 
-'use strict';
 
 //require('dotenv').config();
 //const DATABASE_URL = process.env.DATABASE_URL || global.DATABASE_URL;
