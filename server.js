@@ -3,12 +3,10 @@
 const bodyParser = require('body-parser');
 const express = require('express');
 const mongoose = require('mongoose');
-const chai = require('chai');
 
 mongoose.Promise = global.Promise;
 const {PORT, DATABASE_URL} = require('./config');
 const {Blog} = require('./models');
-chai.use(require('chai-moment-js'));
 const app = express();
 app.use(bodyParser.json());
 
