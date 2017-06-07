@@ -1,10 +1,12 @@
+'use strict';
+
 const bodyParser = require('body-parser');
 const express = require('express');
 const mongoose = require('mongoose');
 
 mongoose.Promise = global.Promise;
-const {PORT, DATABASE_URL} = require('./config');
-const {Blog} = require('./models');
+const { PORT, DATABASE_URL } = require('./config');
+const { Blog } = require('./models');
 
 const app = express();
 app.use(bodyParser.json());
@@ -24,29 +26,29 @@ app.get('/blogs', (req, res) => {
       });
     })
     .catch(
-      err => {
-        console.error(err);
-        res.status(500).json({message: 'Internal server error'});
+    err => {
+      console.error(err);
+      res.status(500).json({ message: 'Internal server error' });
     });
 });
 
 app.get('/blogs/:id', (req, res) => {
-    console.log(req.params.id);
+  console.log(req.params.id);
   Blog
     // this is a convenience method Mongoose provides for searching
     // by the object _id property
     .findById(req.params.id)
     .exec()
-    .then(blog =>res.json(blog.apiRepr()))
+    .then(blog => res.json(blog.apiRepr()))
     .catch(err => {
       console.error(err);
-        res.status(500).json({message: 'Internal server error'})
+      res.status(500).json({ message: 'Internal server error' })
     });
 });
 
 app.post('/blogs', (req, res) => {
   const requiredFields = ['title', 'content', 'author'];
-  for (let i=0; i<requiredFields.length; i++) {
+  for (let i = 0; i < requiredFields.length; i++) {
     const field = requiredFields[i];
     if (!(field in req.body)) {
       const message = `Missing \`${field}\` in request body`
@@ -60,12 +62,12 @@ app.post('/blogs', (req, res) => {
       title: req.body.title,
       content: req.body.content,
       author: req.body.author,
-      })
+    })
     .then(
-      blog => res.status(201).json(blog.apiRepr()))
+    blog => res.status(201).json(blog.apiRepr()))
     .catch(err => {
       console.error(err);
-      res.status(500).json({message: 'Internal server error'});
+      res.status(500).json({ message: 'Internal server error' });
     });
 });
 
@@ -76,7 +78,7 @@ app.put('/blogs/:id', (req, res) => {
       `Request path id (${req.params.id}) and request body id ` +
       `(${req.body.id}) must match`);
     console.error(message);
-    res.status(400).json({message: message});
+    res.status(400).json({ message: message });
   }
 
   // we only support a subset of fields being updateable.
@@ -93,10 +95,10 @@ app.put('/blogs/:id', (req, res) => {
 
   Blog
     // all key/value pairs in toUpdate will be updated -- that's what `$set` does
-    .findByIdAndUpdate(req.params.id, {$set: toUpdate})
+    .findByIdAndUpdate(req.params.id, { $set: toUpdate })
     .exec()
     .then(blog => res.status(204).end())
-    .catch(err => res.status(500).json({message: 'Internal server error'}));
+    .catch(err => res.status(500).json({ message: 'Internal server error' }));
 });
 
 app.delete('/blogs/:id', (req, res) => {
@@ -104,21 +106,21 @@ app.delete('/blogs/:id', (req, res) => {
     .findByIdAndRemove(req.params.id)
     .exec()
     .then(blog => res.status(204).end())
-    .catch(err => res.status(500).json({message: 'Internal server error'}));
+    .catch(err => res.status(500).json({ message: 'Internal server error' }));
 });
 
 // catch-all endpoint if client makes request to non-existent endpoint
-app.use('*', function(req, res) {
-  res.status(404).json({message: 'Not Found'});
+app.use('*', function (req, res) {
+  res.status(404).json({ message: 'Not Found' });
 });
 
 let server;
 
 // this function connects to our database, then starts the server
-function runServer(databaseUrl=DATABASE_URL, port=PORT) {
+function runServer(databaseUrl = DATABASE_URL, port = PORT) {
 
   return new Promise((resolve, reject) => {
-      console.log(databaseUrl);
+    console.log(databaseUrl);
     mongoose.connect(databaseUrl, err => {
       if (err) {
         return reject(err);
@@ -127,10 +129,10 @@ function runServer(databaseUrl=DATABASE_URL, port=PORT) {
         console.log(`Your app is listening on port ${port}`);
         resolve();
       })
-      .on('error', err => {
-        mongoose.disconnect();
-        reject(err);
-      });
+        .on('error', err => {
+          mongoose.disconnect();
+          reject(err);
+        });
     });
   });
 }
@@ -139,15 +141,15 @@ function runServer(databaseUrl=DATABASE_URL, port=PORT) {
 // use it in our integration tests later.
 function closeServer() {
   return mongoose.disconnect().then(() => {
-     return new Promise((resolve, reject) => {
-       console.log('Closing server');
-       server.close(err => {
-           if (err) {
-               return reject(err);
-           }
-           resolve();
-       });
-     });
+    return new Promise((resolve, reject) => {
+      console.log('Closing server');
+      server.close(err => {
+        if (err) {
+          return reject(err);
+        }
+        resolve();
+      });
+    });
   });
 }
 
@@ -157,4 +159,4 @@ if (require.main === module) {
   runServer().catch(err => console.error(err));
 };
 
-module.exports = {app, runServer, closeServer};
+module.exports = { app, runServer, closeServer };
