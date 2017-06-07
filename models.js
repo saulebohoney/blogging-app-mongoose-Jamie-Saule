@@ -7,13 +7,13 @@ const mongoose = require('mongoose');
 //    this.name = 'StorageException';
 // }
 const blogSchema = mongoose.Schema({
-  title: {type: String, required: true},
-  content: {type: String, required: true},
+  title: { type: String, required: true },
+  content: { type: String, required: true },
   author: {
-    firstName: {type: String, required: true},
-    lastName:{ type: String,  required: true}
-},
-  created: {type: Date, default: Date.now}
+    firstName: { type: String, required: true },
+    lastName: { type: String, required: true }
+  },
+  created: { type: Date, default: Date.now }
 });
 // date: { type: Date, default: Date.now },
 // const blogSchema = mongoose.Schema({
@@ -26,10 +26,11 @@ const blogSchema = mongoose.Schema({
 //   }
 // })
 
-blogSchema.virtual('nameString').get(function() {
-  return `${this.author.firstName} ${this.author.lastName}`.trim();});
+blogSchema.virtual('nameString').get(function () {
+  return `${this.author.firstName} ${this.author.lastName}`.trim();
+});
 
-blogSchema.methods.apiRepr = function() {
+blogSchema.methods.apiRepr = function () {
   return {
     id: this._id,
     title: this.title,
@@ -41,4 +42,4 @@ blogSchema.methods.apiRepr = function() {
 
 const Blog = mongoose.model('Blog', blogSchema);
 
-module.exports = {Blog};
+module.exports = { Blog };
