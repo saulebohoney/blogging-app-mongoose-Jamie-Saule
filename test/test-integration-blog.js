@@ -37,7 +37,7 @@ function generateBlogData() {
             firstName: faker.name.firstName(),
             lastName: faker.name.lastName()
         },
-        created: faker.date.recent()
+       // created: faker.date.recent()
     };
 }
 
@@ -75,7 +75,7 @@ describe('Blog API resource', function () {
 
   //ALL OTHER TESTS///
 
-    describe.only('GET endpoint', function () {
+    describe('GET endpoint', function () {
 
         it('should return all existing blog posts', function () {
       // strategy:
@@ -95,7 +95,7 @@ describe('Blog API resource', function () {
             res.should.have.status(200);
           // otherwise our db seeding didn't work
             res.body.blogs.should.have.length.of.at.least(1);
-            console.log(res.body.blogs[0]);
+            //console.log(res.body.blogs[0]);
             return Blog.count();
         })
         .then(function (count) {
@@ -129,9 +129,12 @@ describe('Blog API resource', function () {
             resBlog.id.should.equal(blog.id);
             resBlog.title.should.equal(blog.title);
             resBlog.content.should.equal(blog.content);
-            resBlog.author.should.equal(blog.author.firstName + ' '+ blog.author.lastName);
+            resBlog.author.should.equal(`${blog.author.firstName} ${blog.author.lastName}`);
             //resBlog.author.lastName.should.equal(blog.author.lastName);
-            resBlog.created.should.equal(blog.created);
+            resBlog.created.should.be.sameMoment(blog.created);
+
+    
+            
           //try making created to created.should.equal and see if there is difference//
         });
         });
@@ -145,11 +148,14 @@ describe('Blog API resource', function () {
         it('should add a new blog', function () {
 
             const newBlog = generateBlogData();
+            console.log('this is the original date', newBlog.created);
+            let createdAt;
 
             return chai.request(app)
         .post('/blogs')
         .send(newBlog)
         .then(function (res) {
+          console.log("this is the new blog", res.body.created);
             res.should.have.status(201);
             res.should.be.json;
             res.body.should.be.a('object');
@@ -159,87 +165,97 @@ describe('Blog API resource', function () {
           // cause Mongo should have created id on insertion
             res.body.id.should.not.be.null;
             res.body.content.should.equal(newBlog.content);
-            res.body.author.should.equal(newBlog.author);
-            res.body.created.should.equal(newBlog.created);
+            res.body.author.should.equal(`${newBlog.author.firstName} ${newBlog.author.lastName}`);
+            res.body.created.should.not.be.null;
+            createdAt=res.body.created;
+            console.log('res.body.created!',res.body.created);
+            
+
 
             return Blog.findById(res.body.id);
         })
         .then(function (blog) {
             blog.title.should.equal(newBlog.title);
             blog.content.should.equal(newBlog.content);
-            blog.author.should.equal(newBlog.author);
-            blog.created.should.equal(newBlog.created);
+            // blog.author.should.equal(`${newBlog.author.firstName} ${newBlog.author.lastName}`);
+            blog.author.firstName.should.equal(newBlog.author.firstName);
+            blog.author.lastName.should.equal(newBlog.author.lastName);
+            console.log('blog.created',blog.created);
+            // log some other created date with which to check against blog.created
+            //blog.created.should.equal(newBlog.created);
+            blog.created.should.be.sameMoment(createdAt);
+          
         });
         });
     });
 
-    // describe('PUT endpoint', function () {
+    describe('PUT endpoint', function () {
 
-    // // strategy:
-    // //  1. Get an existing restaurant from db
-    // //  2. Make a PUT request to update that restaurant
-    // //  3. Prove restaurant returned by request contains data we sent
-    // //  4. Prove restaurant in db is correctly updated
-    //     it('should update fields you send over', function () {
-    //         const updateData = {
-    //           name: 'fofofofofofofof',
-    //           cuisine: 'futuristic fusion'
-    //       };
+    // strategy:
+    //  1. Get an existing restaurant from db
+    //  2. Make a PUT request to update that restaurant
+    //  3. Prove restaurant returned by request contains data we sent
+    //  4. Prove restaurant in db is correctly updated
+        it('should update fields you send over', function () {
+            const updateData = {
+              title: ' ',
+              content: ' ',
+          };
 
-    //         return Restaurant
-    //     .findOne()
-    //     .exec()
-    //     .then(function (restaurant) {
-    //         updateData.id = restaurant.id;
+            return Blog
+        .findOne()
+        .exec()
+        .then(function (blog) {
+            updateData.id = blog.id;
 
-    //       // make request then inspect it to make sure it reflects
-    //       // data we sent
-    //         return chai.request(app)
-    //         .put(`/restaurants/${restaurant.id}`)
-    //         .send(updateData);
-    //     })
-    //     .then(function (res) {
-    //         res.should.have.status(204);
+          // make request then inspect it to make sure it reflects
+          // data we sent
+            return chai.request(app)
+            .put(`/blogs/${blog.id}`)
+            .send(updateData);
+        })
+        .then(function (res) {
+            res.should.have.status(204);
 
-    //         return Restaurant.findById(updateData.id).exec();
-    //     })
-    //     .then(function (restaurant) {
-    //         restaurant.name.should.equal(updateData.name);
-    //         restaurant.cuisine.should.equal(updateData.cuisine);
-    //     });
-    //     });
-    // });
+            return Blog.findById(updateData.id).exec();
+        })
+        .then(function (blog) {
+            blog.title.should.equal(updateData.title);
+            blog.content.should.equal(updateData.content);
+        });
+        });
+    });
 
-    // describe('DELETE endpoint', function () {
-    // // strategy:
-    // //  1. get a restaurant
-    // //  2. make a DELETE request for that restaurant's id
-    // //  3. assert that response has right status code
-    // //  4. prove that restaurant with the id doesn't exist in db anymore
-    //     it('delete a restaurant by id', function () {
+    describe('DELETE endpoint', function () {
+    // strategy:
+    //  1. get a restaurant
+    //  2. make a DELETE request for that restaurant's id
+    //  3. assert that response has right status code
+    //  4. prove that restaurant with the id doesn't exist in db anymore
+        it('delete a blog by id', function () {
 
-    //         let restaurant;
+            let blog;
 
-    //         return Restaurant
-    //     .findOne()
-    //     .exec()
-    //     .then(function (_restaurant) {
-    //         restaurant = _restaurant;
-    //         return chai.request(app).delete(`/restaurants/${restaurant.id}`);
-    //     })
-    //     .then(function (res) {
-    //         res.should.have.status(204);
-    //         return Restaurant.findById(restaurant.id).exec();
-    //     })
-    //     .then(function (_restaurant) {
-    //       // when a variable's value is null, chaining `should`
-    //       // doesn't work. so `_restaurant.should.be.null` would raise
-    //       // an error. `should.be.null(_restaurant)` is how we can
-    //       // make assertions about a null value.
-    //         should.not.exist(_restaurant);
-    //     });
-    //     });
-    // });
+            return Blog
+        .findOne()
+        .exec()
+        .then(function (_blog) {
+            blog = _blog;
+            return chai.request(app).delete(`/blogs/${blog.id}`);
+        })
+        .then(function (res) {
+            res.should.have.status(204);
+            return Blog.findById(blog.id).exec();
+        })
+        .then(function (_blog) {
+          // when a variable's value is null, chaining `should`
+          // doesn't work. so `_restaurant.should.be.null` would raise
+          // an error. `should.be.null(_restaurant)` is how we can
+          // make assertions about a null value.
+            should.not.exist(_blog);
+        });
+        });
+    });
 
 
 
